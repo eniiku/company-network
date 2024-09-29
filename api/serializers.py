@@ -2,9 +2,25 @@ from rest_framework import serializers
 from .models import Company
 
 class CompanySerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=200)
-    industry = serializers.CharField(max_length=100, required=False)
-    founded_year = serializers.CharField(max_length=4, required=False)
+    name = serializers.CharField(
+    max_length=200,
+    help_text="The name of the company"
+    )   
+    industry = serializers.CharField(
+        max_length=100,
+        required=False,
+        help_text="The industry sector of the company"
+    )
+    founded_year = serializers.CharField(
+        max_length=4,
+        required=False,
+        help_text="The year the company was founded"
+    )
+
+    class Meta:
+        swagger_schema_fields = {
+            "description": "Represents a company in the network"
+        }
 
     def to_representation(self, instance):
         return {

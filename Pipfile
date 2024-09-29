@@ -12,6 +12,7 @@ gunicorn = "*"
 python-dotenv = "*"
 neomodel = "*"
 django-filter = "*"
+drf-yasg = "*"
 
 [dev-packages]
 

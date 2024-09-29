@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django_neomodel',
     'api',
     'frontend',
+    'drf_yasg'
 ]
 
 REST_FRAMEWORK = {
