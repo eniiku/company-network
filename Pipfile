@@ -5,6 +5,12 @@ name = "pypi"
 
 [packages]
 django = "*"
+django-neomodel = "*"
+django-cors-headers = "*"
+djangorestframework = "*"
+gunicorn = "*"
+python-dotenv = "*"
+neomodel = "*"
 
 [dev-packages]
 
