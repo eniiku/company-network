@@ -27,7 +27,16 @@ const simulation = d3
 
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
+function showLoading() {
+    document.getElementById("loading-overlay").style.display = "flex"
+}
+
+function hideLoading() {
+    document.getElementById("loading-overlay").style.display = "none"
+}
+
 function fetchData() {
+    showLoading()
     return fetch("/api/v1/companies/")
         .then((response) => response.json())
         .then((companies) => {
@@ -35,7 +44,7 @@ function fetchData() {
             const links = []
 
             const promises = companies.map((company) =>
-                fetch(`/api/v1/companies/${company.name}/get_relationships/`)
+                fetch(`/api/v1/companies/${company.name}/relationships/`)
                     .then((response) => response.json())
                     .then((relationships) => {
                         Object.entries(relationships).forEach(([type, related]) => {
@@ -50,7 +59,10 @@ function fetchData() {
                     })
             )
 
-            Promise.all(promises).then(() => updateGraph(nodes, links))
+            Promise.all(promises).then(() => {
+                updateGraph(nodes, links)
+                hideLoading()
+            })
         })
 }
 
@@ -76,16 +88,14 @@ function updateGraph(nodes, links) {
         .attr("fill", (d) => color(d.industry))
 
     node.append("text")
-        .attr("dx", 15)
+        .attr("dx", 12)
         .attr("dy", ".35em")
         .text((d) => d.name)
         .style("font-size", "12px")
 
-    node.on("mouseover", function (event, d) {
-        d3.select(this).select("circle").transition().duration(300).attr("r", 15)
-    }).on("mouseout", function (event, d) {
-        d3.select(this).select("circle").transition().duration(300).attr("r", 10)
-    })
+    node.append("title").text(
+        (d) => `${d.name}\nIndustry: ${d.industry}\nFounded: ${d.founded_year}`
+    )
 
     simulation.nodes(nodes).on("tick", ticked)
 
