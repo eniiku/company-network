@@ -1,5 +1,5 @@
-# Use an official Python runtime as the base image
-FROM python:3.9
+# Base image
+FROM python:3.12.6
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -12,11 +12,14 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY Pipfile Pipfile.lock /app/
-RUN pip install pipenv && pipenv install --system --deploy
+# Copy the requirements file
+COPY requirements.txt /app/
+
+# Install project dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the project code into the container
 COPY . /app/
@@ -30,5 +33,11 @@ RUN chmod -R 755 /app/staticfiles
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK CMD curl --fail http://localhost:8000/health/ || exit 1
+
 # Run the application
-CMD sh -c "python manage.py populate_db && gunicorn --bind 0.0.0.0:8000 company_network.wsgi:application"
+CMD sh -c "python manage.py migrate && python manage.py populate_db && gunicorn --workers=3 --bind 0.0.0.0:8000 company_network.wsgi:application"
