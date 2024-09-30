@@ -28,11 +28,21 @@ const simulation = d3
 const color = d3.scaleOrdinal(d3.schemeCategory10)
 
 function showLoading() {
-    document.getElementById("loading-overlay").style.display = "flex"
+    const loadingOverlay = document.getElementById("loading-overlay")
+    if (loadingOverlay) {
+        loadingOverlay.style.display = "flex"
+    } else {
+        console.warn("Loading overlay element not found")
+    }
 }
 
 function hideLoading() {
-    document.getElementById("loading-overlay").style.display = "none"
+    const loadingOverlay = document.getElementById("loading-overlay")
+    if (loadingOverlay) {
+        loadingOverlay.style.display = "none"
+    } else {
+        console.warn("Loading overlay element not found")
+    }
 }
 
 function fetchData() {
@@ -59,10 +69,17 @@ function fetchData() {
                     })
             )
 
-            Promise.all(promises).then(() => {
-                updateGraph(nodes, links)
+            return Promise.all(promises).then(() => {
                 hideLoading()
+                return { nodes, links }
             })
+        })
+        .then(({ nodes, links }) => {
+            updateGraph(nodes, links)
+        })
+        .catch((error) => {
+            console.error("Error fetching data:", error)
+            hideLoading()
         })
 }
 
@@ -128,4 +145,4 @@ function updateGraph(nodes, links) {
     }
 }
 
-fetchData()
+document.addEventListener("DOMContentLoaded", fetchData)
