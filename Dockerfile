@@ -24,12 +24,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the project code into the container
 COPY . /app/
 
-# Create a directory for static files
-RUN mkdir -p /app/staticfiles
-
-# Set permissions for the static files directory
-RUN chmod -R 755 /app/staticfiles
-
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
